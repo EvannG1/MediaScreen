@@ -1,7 +1,7 @@
 {% extends "Layout.twig" %}
 
 {% block style %}
-<link rel="stylesheet" href="/assets/css/gestion_sequence.css">
+<link rel="stylesheet" href="{{ base_url() }}/assets/css/gestion_sequence.css">
 <style>
     .notification{
       position: fixed;
@@ -43,7 +43,7 @@
                 {% if user.is_superadmin == 1 %}
                     <i class="fa fa-check" aria-hidden="true"></i>
                 {% endif %}
-                
+
             </td>
 
             <td class="panel_update">
