@@ -75,10 +75,11 @@
                                 <div class="modal-body">
                                     <form>
                                         <div class="form-group">
-                                            <label class="control-label">Nom écran :</label>
+                                            <label class="control-label">Nom de l'écran :</label>
                                             <input type="text" value="{{ screen.nom }}"
                                                 class="form-control update_nomEcran">
                                         </div>
+                                        {% if screen.id_type == 1 %}
                                         <div class="form-group">
                                             <label for="markdown_area">Veuillez saisir votre text markdown ci-dessous :</label>
                                             <textarea class="form-control update_contenuEcran" id="markdown_area" name="markdown_area" rows="5">{{ screen.contenu }}</textarea>
@@ -87,12 +88,21 @@
                                             <label class="control-label">Veuillez saisir le temps de l'écran (en seconde):</label>
                                             <input class="form-control update_ecran_time" value="{{ screen.temps / 1000 }}" type="number">
                                         </div>
+                                        {% elseif screen.id_type == 2 %}
+                                        <div class="form-group">
+                                            <label for="content_area" class="control-label">ID de la vidéo YouTube</label>
+                                            <input class="form-control update_contenuEcran" id="content_area" value="{{ screen.contenu }}" type="text">
+                                        </div>
+                                        {% endif %}
                                     </form>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                                    <button type="button" class="btn btn-dark" onclick="updateEcran({{ screen.id }}, this)">Modifier
-                                        l'écran</button>
+                                    {% if screen.id_type == 1 %}
+                                    <button type="button" class="btn btn-dark" onclick="updateEcranMarkdown({{ screen.id }}, this)">Modifier l'écran</button>
+                                    {% elseif screen.id_type == 2 %}
+                                    <button type="button" class="btn btn-dark" onclick="updateEcranVideo({{ screen.id }}, this)">Modifier l'écran</button>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -170,7 +180,7 @@ function deleteEcran(id, leBtn) {
     http.send(params);
 }
 
-function updateEcran(id, leBtn) {
+function updateEcranMarkdown(id, leBtn) {
     let bodyModal = $(leBtn).parent().prev('.modal-body');
     let nom = $(bodyModal).find('.update_nomEcran').val();
     let content = $(bodyModal).find('.update_contenuEcran').val();
@@ -186,7 +196,7 @@ function updateEcran(id, leBtn) {
             '&newNom=' + nom +
             '&newContent=' + content +
             '&newEcranTime=' + ecranTime;
-        http.open('POST', '{{ path_for('screenUpdate') }}', true);
+        http.open('POST', '{{ path_for('screenUpdateMarkdown') }}', true);
 
         http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         http.onreadystatechange = function () {
@@ -195,6 +205,41 @@ function updateEcran(id, leBtn) {
                 if (http.responseText == 'success') {
                     $(lineUpdate).find('.panel_nomEcran').text(nom);
                     $(lineUpdate).find('.panel_duree').text(ecranTime + "s");
+                    $(model).modal('hide');
+                    showNotification('success', "Succès : L'écran : " + nom + " a bien été modifié.");
+                } else {
+                    showNotification('danger', 'Erreur : ', http.responseText);
+                }
+            }
+        }
+        http.send(params);
+    } else {
+        alert("Une erreur est survenue : des champs sont manquants, introuvable, ou incomplet \n\rSi le problème persiste actualisez la page ou contacter l'administrateur du site.");
+    }
+}
+
+function updateEcranVideo(id, leBtn) {
+    let bodyModal = $(leBtn).parent().prev('.modal-body');
+    let nom = $(bodyModal).find('.update_nomEcran').val();
+    let content = $(bodyModal).find('.update_contenuEcran').val();
+
+    if (nom) {
+        let model = $(leBtn).parents().closest('.modal');
+        let lineUpdate = $(leBtn).parents().closest('tr');
+        let http = new XMLHttpRequest();
+
+        let params =
+            'id=' + id +
+            '&newNom=' + nom +
+            '&newContent=' + content;
+        http.open('POST', '{{ path_for('screenUpdateVideo') }}', true);
+
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        http.onreadystatechange = function () {
+            if (http.readyState == 4 && http.status == 200) {
+                  console.log(http.responseText);
+                if (http.responseText == 'success') {
+                    $(lineUpdate).find('.panel_nomEcran').text(nom);
                     $(model).modal('hide');
                     showNotification('success', "Succès : L'écran : " + nom + " a bien été modifié.");
                 } else {

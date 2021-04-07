@@ -50,6 +50,7 @@ class PagesPostController extends Controller {
         $id_sequence = htmlspecialchars(trim($args['id']));
         $type = htmlspecialchars(trim($request->getParam('screen_type')));
         $markdown = htmlspecialchars(trim($request->getParam('markdown_area')));
+        $video = htmlspecialchars(trim($request->getParam('video')));
         $screen_time = htmlspecialchars(trim($request->getParam('screen_time')));
 
         if(empty($screen_name)) {
@@ -60,6 +61,12 @@ class PagesPostController extends Controller {
                     $this->flash("Le contenu de l'écran et/ou le temps d'affichage ne peuvent être vide !", 'error');
                 } else {
                     Ecran::insert(['nom' => $screen_name, 'contenu' => $markdown, 'temps' => $screen_time * 1000, 'id_sequence' => $id_sequence, 'id_type' => 1, 'auteur' => $_SESSION['id']]);
+                }
+            } elseif($type == 'video') {
+                if(empty($video)) {
+                    $this->flash("Le champs ID ne peut être vide !", 'error');
+                } else {
+                    Ecran::insert(['nom' => $screen_name, 'contenu' => $video, 'id_sequence' => $id_sequence, 'id_type' => 2, 'auteur' => $_SESSION['id']]);
                 }
             }
         }
@@ -78,7 +85,7 @@ class PagesPostController extends Controller {
         }
     }
 
-    public function screenUpdate(Request $request, Response $response) {
+    public function screenUpdateMarkdown(Request $request, Response $response) {
         $id = $request->getParam('id');
         $name = htmlspecialchars(trim($request->getParam('newNom')));
         $content = htmlspecialchars(trim($request->getParam('newContent')));
@@ -90,6 +97,21 @@ class PagesPostController extends Controller {
             return "L'écran que vous essayez de modifier n'existe pas !";
         } else {
             Ecran::where('id', '=', $id)->update(['nom' => $name, 'contenu' => $content, 'temps' => $temps * 1000]);
+            return "success";
+        }
+    }
+
+    public function screenUpdateVideo(Request $request, Response $response) {
+        $id = $request->getParam('id');
+        $name = htmlspecialchars(trim($request->getParam('newNom')));
+        $content = htmlspecialchars(trim($request->getParam('newContent')));
+
+        $exist = Ecran::where('id', '=', $id)->count();
+
+        if(!$exist) {
+            return "L'écran que vous essayez de modifier n'existe pas !";
+        } else {
+            Ecran::where('id', '=', $id)->update(['nom' => $name, 'contenu' => $content]);
             return "success";
         }
     }

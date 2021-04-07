@@ -54,11 +54,14 @@ $app->group('', function() {
     // Route : Page de gestion des écrans (GET)
     $this->get('/screens/{id}', PagesGetController::class . ':screens')->setName('screens');
 
+    // Route : Modification d'un écran Markdown (POST)
+    $this->post('/screen/update/markdown', PagesPostController::class . ':screenUpdateMarkdown')->setName('screenUpdateMarkdown');
+
+    // Route : Modification d'un écran vidéo (POST)
+    $this->post('/screen/update/video', PagesPostController::class . ':screenUpdateVideo')->setName('screenUpdateVideo');
+
     // Route : Suppression d'un écran (POST)
     $this->post('/screen/delete', PagesPostController::class . ':screenDelete')->setName('screenDelete');
-
-    // Route : Modification d'un écran (POST)
-    $this->post('/screen/update', PagesPostController::class . ':screenUpdate')->setName('screenUpdate');
 
     // Route : Suppression d'une séquence (POST)
     $this->post('/sequence/delete', PagesPostController::class . ':sequenceDelete')->setName('sequenceDelete');
@@ -89,9 +92,6 @@ $app->group('', function() {
 
     // Route : Page de création d'un dispositif d'affichage (POST)
     $this->post('/create/device', PagesPostController::class . ':createDevice')->setName('createDevice');
-
-    // Route : Modification d'un dispositif (POST)
-    $this->post('/device/update', PagesPostController::class . ':deviceUpdate')->setName('deviceUpdate');
 
     // Route : Suppression d'un dispositif (POST)
     $this->post('/device/delete', PagesPostController::class . ':deviceDelete')->setName('deviceDelete');
