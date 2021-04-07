@@ -93,6 +93,9 @@ $app->group('', function() {
     // Route : Page de création d'un dispositif d'affichage (POST)
     $this->post('/create/device', PagesPostController::class . ':createDevice')->setName('createDevice');
 
+    // Route : Modification d'un dispositif (POST)
+    $this->post('/device/update', PagesPostController::class . ':deviceUpdate')->setName('deviceUpdate');
+
     // Route : Suppression d'un dispositif (POST)
     $this->post('/device/delete', PagesPostController::class . ':deviceDelete')->setName('deviceDelete');
 
