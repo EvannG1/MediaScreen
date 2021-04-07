@@ -240,6 +240,7 @@ function updateEcranVideo(id, leBtn) {
                   console.log(http.responseText);
                 if (http.responseText == 'success') {
                     $(lineUpdate).find('.panel_nomEcran').text(nom);
+                    $(lineUpdate).find('.panel_duree').text(http.responseText['duration'] + "s");
                     $(model).modal('hide');
                     showNotification('success', "Succès : L'écran : " + nom + " a bien été modifié.");
                 } else {

@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '95983543c81f31ac929eb7f3a503573bb2c9b9cd',
+    'reference' => '8f9f8ab54b0d5cca834a00109fa5635fdb0f6413',
     'name' => 'ciasie/mediascreen',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '95983543c81f31ac929eb7f3a503573bb2c9b9cd',
+      'reference' => '8f9f8ab54b0d5cca834a00109fa5635fdb0f6413',
     ),
     'doctrine/inflector' => 
     array (
@@ -182,8 +182,8 @@
     array (
       'provided' => 
       array (
-        0 => '1.0',
-        1 => '1.0.0',
+        0 => '1.0.0',
+        1 => '1.0',
       ),
     ),
     'psr/simple-cache' => 

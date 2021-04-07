@@ -12,6 +12,15 @@ use Illuminate\Container\Util;
 
 class PagesPostController extends Controller {
 
+    private function ISO8601ToSeconds($ISO8601) {
+        $interval = new \DateInterval($ISO8601);
+
+        return ($interval->d * 24 * 60 * 60) +
+            ($interval->h * 60 * 60) +
+            ($interval->i * 60) +
+            $interval->s;
+    }
+
     public function login(Request $request, Response $response) {
         $email = htmlspecialchars(trim($request->getParam('email_address')));
         $password = htmlspecialchars(trim($request->getParam('password')));
@@ -66,7 +75,10 @@ class PagesPostController extends Controller {
                 if(empty($video)) {
                     $this->flash("Le champs ID ne peut être vide !", 'error');
                 } else {
-                    Ecran::insert(['nom' => $screen_name, 'contenu' => $video, 'id_sequence' => $id_sequence, 'id_type' => 2, 'auteur' => $_SESSION['id']]);
+                    $ytb = new \Madcoda\Youtube\Youtube(array('key' => 'AIzaSyCYy7UEEXjxf7W7XgjNqfNvxSxmsn4I2wI'));
+                    $duration = $ytb->getVideoInfo($video)->contentDetails->duration;
+                    $duration = $this->ISO8601ToSeconds($duration) + 2;
+                    Ecran::insert(['nom' => $screen_name, 'contenu' => $video, 'temps' => $duration * 1000, 'id_sequence' => $id_sequence, 'id_type' => 2, 'auteur' => $_SESSION['id']]);
                 }
             }
         }
@@ -111,7 +123,10 @@ class PagesPostController extends Controller {
         if(!$exist) {
             return "L'écran que vous essayez de modifier n'existe pas !";
         } else {
-            Ecran::where('id', '=', $id)->update(['nom' => $name, 'contenu' => $content]);
+            $ytb = new \Madcoda\Youtube\Youtube(array('key' => 'AIzaSyCYy7UEEXjxf7W7XgjNqfNvxSxmsn4I2wI'));
+            $duration = $ytb->getVideoInfo($content)->contentDetails->duration;
+            $duration = $this->ISO8601ToSeconds($duration) + 2;
+            Ecran::where('id', '=', $id)->update(['nom' => $name, 'contenu' => $content, 'temps' => $duration * 1000]);
             return "success";
         }
     }
