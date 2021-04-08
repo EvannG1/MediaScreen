@@ -158,25 +158,30 @@ class PagesPostController extends Controller {
         }
     }
 
-    public function profile(Request $request, Response $response) {
-        $currentPassword = htmlspecialchars(trim($request->getParam('currentPassword')));
-        $newPassword = htmlspecialchars(trim($request->getParam('newPassword')));
+public function profile(Request $request, Response $response) {
+$currentPassword = htmlspecialchars(trim($request->getParam('currentPassword')));
+$newPassword = htmlspecialchars(trim($request->getParam('newPassword')));
+$passwordCheck = htmlspecialchars(trim($request->getParam('passwordCheck')));
 
-        if(empty($currentPassword) || empty($newPassword)) {
-            $this->flash("Un ou plusieurs champs sont vides !", 'error');
+    if(empty($currentPassword) || empty($newPassword) || empty($passwordCheck)) {
+        $this->flash("Un ou plusieurs champs sont vides !", 'error');
+    } else {
+      if($newPassword != $passwordCheck){
+        $this->flash("Les mots de passe ne sont pas identiques !", 'error');
+      } else {
+        $db_password = Utilisateur::select('mdp')->where('id', $_SESSION['id'])->first();
+
+        if(AuthController::verifyPassword($currentPassword, $db_password->mdp)) {
+            $hashedPassword = AuthController::hashPassword($newPassword);
+            Utilisateur::where('id', $_SESSION['id'])->update(['mdp' => $hashedPassword]);
+            $this->flash("Le mot de passe a bien été sauvegardé !");
         } else {
-            $db_password = Utilisateur::select('mdp')->where('id', $_SESSION['id'])->first();
-
-            if(AuthController::verifyPassword($currentPassword, $db_password->mdp)) {
-                $hashedPassword = AuthController::hashPassword($newPassword);
-                Utilisateur::where('id', $_SESSION['id'])->update(['mdp' => $hashedPassword]);
-                $this->flash("Le mot de passe a bien été sauvegardé !");
-            } else {
-                $this->flash("Mot de passe actuel incorrect !", 'error');
-            }
+            $this->flash("Mot de passe actuel incorrect !", 'error');
         }
-        return $this->redirect($response, 'profile');
+      }
     }
+    return $this->redirect($response, 'profile');
+}
 
     public function createUser(Request $request, Response $response) {
         $firstname_user = htmlspecialchars(trim($request->getParam('name_user')));
