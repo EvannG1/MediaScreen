@@ -99,18 +99,20 @@
 
 {% block script %}
 <script>
-function hideNotification() {
-    $('#notification_block').fadeOut('500', () => {
+function hideNotification(time = '500') {
+    $('#notification_block').fadeOut(time, () => {
         $('#notification_block').removeClass();
     });
 }
 
 function showNotification(libelle_bootstrap, message) {
-    hideNotification();
-    $('#notification_block p').text(message)
-    $('#notification_block').addClass("notification")
-    $('#notification_block').addClass('alert alert-' + libelle_bootstrap)
-    $('#notification_block').fadeIn('500');
+    hideNotification(100);//prend 100ms à se fermer
+    setTimeout(function(){
+      $('#notification_block p').text(message)
+      $('#notification_block').addClass("notification")
+      $('#notification_block').addClass('alert alert-' + libelle_bootstrap)
+      $('#notification_block').fadeIn('500');
+    }, 150);
 }
 
 function deleteSequence(id, leBtn) {
