@@ -158,51 +158,63 @@ class PagesPostController extends Controller {
         }
     }
 
-    public function profile(Request $request, Response $response) {
-        $currentPassword = htmlspecialchars(trim($request->getParam('currentPassword')));
-        $newPassword = htmlspecialchars(trim($request->getParam('newPassword')));
+public function profile(Request $request, Response $response) {
+$currentPassword = htmlspecialchars(trim($request->getParam('currentPassword')));
+$newPassword = htmlspecialchars(trim($request->getParam('newPassword')));
+$passwordCheck = htmlspecialchars(trim($request->getParam('passwordCheck')));
 
-        if(empty($currentPassword) || empty($newPassword)) {
-            $this->flash("Un ou plusieurs champs sont vides !", 'error');
+    if(empty($currentPassword) || empty($newPassword) || empty($passwordCheck)) {
+        $this->flash("Un ou plusieurs champs sont vides !", 'error');
+    } else {
+      if($newPassword != $passwordCheck){
+        $this->flash("Les mots de passe ne sont pas identiques !", 'error');
+      } else {
+        $db_password = Utilisateur::select('mdp')->where('id', $_SESSION['id'])->first();
+
+        if(AuthController::verifyPassword($currentPassword, $db_password->mdp)) {
+            $hashedPassword = AuthController::hashPassword($newPassword);
+            Utilisateur::where('id', $_SESSION['id'])->update(['mdp' => $hashedPassword]);
+            $this->flash("Le mot de passe a bien été sauvegardé !");
         } else {
-            $db_password = Utilisateur::select('mdp')->where('id', $_SESSION['id'])->first();
-
-            if(AuthController::verifyPassword($currentPassword, $db_password->mdp)) {
-                $hashedPassword = AuthController::hashPassword($newPassword);
-                Utilisateur::where('id', $_SESSION['id'])->update(['mdp' => $hashedPassword]);
-                $this->flash("Le mot de passe a bien été sauvegardé !");
-            } else {
-                $this->flash("Mot de passe actuel incorrect !", 'error');
-            }
+            $this->flash("Mot de passe actuel incorrect !", 'error');
         }
-        return $this->redirect($response, 'profile');
+      }
     }
+    return $this->redirect($response, 'profile');
+}
 
-    public function createUser(Request $request, Response $response) {
-        $firstname_user = htmlspecialchars(trim($request->getParam('name_user')));
-        $lastname_user = htmlspecialchars(trim($request->getParam('forname_user')));
-        $mail_user = htmlspecialchars(trim($request->getParam('mail_user')));
-        $password_user = htmlspecialchars(trim($request->getParam('mdp_user')));
-        $rank_user = htmlspecialchars(trim($request->getParam('rank_user')));
+public function createUser(Request $request, Response $response) {
+$firstname_user = htmlspecialchars(trim($request->getParam('name_user')));
+$lastname_user = htmlspecialchars(trim($request->getParam('forname_user')));
+$mail_user = htmlspecialchars(trim($request->getParam('mail_user')));
+$password_user = htmlspecialchars(trim($request->getParam('mdp_user')));
+$password_check = htmlspecialchars(trim($request->getParam('mdp_check')));
+$rank_user = htmlspecialchars(trim($request->getParam('rank_user')));
 
-        if(!filter_var($mail_user, FILTER_VALIDATE_EMAIL)) {
-            $this->flash('Cette adresse email est invalide !', 'error');
+    if(!filter_var($mail_user, FILTER_VALIDATE_EMAIL)) {
+        $this->flash('Cette adresse email est invalide !', 'error');
+    } else {
+        if(empty($firstname_user || $lastname_user || $mail_user || $password_user || $password_check || $rank_user)) {
+            $this->flash('Veuillez renseigner tous les champs !', 'error');
         } else {
-            if(empty($firstname_user || $lastname_user || $mail_user || $password_user || $rank_user)) {
-                $this->flash('Veuillez renseigner tous les champs !', 'error');
+            $exist = Utilisateur::where('email', '=', $mail_user)->count();
+            if($exist) {
+                $this->flash('Cette adresse e-mail est déjà utilisée !', 'error');
             } else {
-                $exist = Utilisateur::where('email', '=', $mail_user)->count();
-                if($exist) {
-                    $this->flash('Cette adresse e-mail est déjà utilisée !', 'error');
+                if($password_user != $password_check) {
+                  $this->flash('Les mots de passe ne sont pas identiques !', 'error');
                 } else {
-                    $password_hash = AuthController::hashPassword($password_user);
-                    Utilisateur::insert(['nom' => $firstname_user, 'prenom' => $lastname_user, 'email' => $mail_user, 'mdp' => $password_hash, 'is_superadmin' => $rank_user]);
-                    $this->flash("L'utilisateur a été créé avec succès !");
+                  $password_hash = AuthController::hashPassword($password_user);
+                  Utilisateur::insert(['nom' => $firstname_user, 'prenom' => $lastname_user, 'email' => $mail_user, 'mdp' => $password_hash, 'is_superadmin' => $rank_user]);
+                  $this->flash("L'utilisateur a été créé avec succès !");
                 }
             }
         }
-        return $this->redirect($response, 'createUser');
     }
+    return $this->redirect($response, 'createUser');
+}
+
+
 
     public function createDevice(Request $request, Response $response) {
         $name = htmlspecialchars(trim($request->getParam('nom')));
