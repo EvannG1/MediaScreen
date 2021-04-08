@@ -62,7 +62,7 @@
                 <td class="panel_duree">{{ screen.temps / 1000 }}s</td>
                 <td class="panel_auteur">{{ screen.author.prenom }} {{ screen.author.nom }}</td>
                 <td class="panel_update">
-                    <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#editEcran_{{ screen.id }}">
+                    <button type="button" class="btn btn-default btn-sm openModal" {% if screen.id_type == 1 %}data-indexTab="{{ index }}"{% endif %} data-toggle="modal" data-target="#editEcran_{{ screen.id }}">
                         <i class="far fa-edit"></i>
                     </button>
                     <div class="modal fade exampleModalClass" id="editEcran_{{ screen.id }}" tabindex="-1" role="dialog"
@@ -147,7 +147,14 @@
 var simplemde = [];
 $( document ).ready(function() {
   document.querySelectorAll("textarea").forEach((elem, index) => {
-    simplemde[index] = new SimpleMDE({ element: elem});
+    simplemde[index] = new SimpleMDE({ element: elem, spellChecker: false });
+  });
+  $('.openModal').click(function(event){//Fixed this
+    setTimeout(function(){
+      simplemde.forEach((elem) => {
+        elem.codemirror.refresh();
+      });
+    }, 1000);
   });
 });
 
