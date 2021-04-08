@@ -11,19 +11,6 @@
       width: 100%;
     }
 
-    .markdown-btn{
-      display: flex;
-      justify-content: left;
-      flex-wrap: wrap;
-    }
-
-    .markdown-btn button{
-      margin-right: 7px;
-      margin-bottom: 7px;
-      padding: 5px;
-      font-size: 12px;
-    }
-
     {% if screens is empty %}
         table {
             display: none;
@@ -33,6 +20,8 @@
 {% endblock %}
 
 {% block content %}
+{% set index = 0 %}
+
 <div id="notification_block" class="notification" style="z-index: 999;display: none;">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="hideNotification()">
         <span aria-hidden="true">&times;</span>
@@ -42,7 +31,7 @@
 
 <h1>Écrans de la séquence : {{ sequence.nom }}</h1>
 
-<a href="{{ path_for('createScreen', {id: id}) }}" class="btn btn-primary">Créer un écran</a>
+<a href="{{ path_for('createScreen', {id: id}) }}" class="btn btn-primary" style="margin-bottom: 0.5rem;">Créer un écran</a>
 
 <table class="table table-sm table-hover">
     <thead>
@@ -95,15 +84,6 @@
                                         {% if screen.id_type == 1 %}
                                         <div class="form-group">
                                             <label for="markdown_area">Veuillez saisir votre text markdown ci-dessous :</label>
-                                            <div class="markdown-btn">
-                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-h1', event)">Titre niveau 1</button>
-                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-h2', event)">Titre niveau 2</button>
-                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-h3', event)">Titre niveau 3</button>
-                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-talic', event)">Italic</button>
-                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-bold', event)">Gras</button>
-                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-souligner', event)">Souligner</button>
-                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-hr', event)">Put HR</button>
-                                            </div>
                                             <textarea class="form-control update_contenuEcran" id="markdown_area" name="markdown_area" rows="5">{{ screen.contenu }}</textarea>
                                         </div>
                                         <div class="form-group">
@@ -121,7 +101,8 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
                                     {% if screen.id_type == 1 %}
-                                    <button type="button" class="btn btn-dark" onclick="updateEcranMarkdown({{ screen.id }}, this)">Modifier l'écran</button>
+                                    <button type="button" class="btn btn-dark" onclick="updateEcranMarkdown({{ screen.id }}, this, {{ index }})">Modifier l'écran</button>
+                                    {% set index = index + 1 %}
                                     {% elseif screen.id_type == 2 %}
                                     <button type="button" class="btn btn-dark" onclick="updateEcranVideo({{ screen.id }}, this)">Modifier l'écran</button>
                                     {% endif %}
@@ -161,37 +142,14 @@
 {% endblock %}
 
 {% block script %}
-<script src="{{ base_url() }}/assets/js/rangyinputs-jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
-
-function markdowner(modder, event){
-  let textarea = $($(event.target).parents('.form-group').find('textarea')[0]);
-
-  switch(modder){
-    case 'make-h1':
-      textarea.surroundSelectedText("#", "");
-      break;
-    case 'make-h2':
-      textarea.surroundSelectedText("##", "");
-      break;
-    case 'make-h3':
-      textarea.surroundSelectedText("###", "");
-      break;
-    case 'make-talic':
-      textarea.surroundSelectedText("*", "*");
-      break;
-    case 'make-bold':
-      textarea.surroundSelectedText("**", "**");
-      break;
-    case 'make-souligner':
-      textarea.surroundSelectedText("__", "__");
-      break;
-    case 'make-hr':
-      textarea.surroundSelectedText("----", "");
-      break;
-
-  }
-}
+var simplemde = [];
+$( document ).ready(function() {
+  document.querySelectorAll("textarea").forEach((elem, index) => {
+    simplemde[index] = new SimpleMDE({ element: elem});
+  });
+});
 
 function hideNotification(time = '500') {
     $('#notification_block').fadeOut(time, () => {
@@ -235,10 +193,10 @@ function deleteEcran(id, leBtn) {
     http.send(params);
 }
 
-function updateEcranMarkdown(id, leBtn) {
+function updateEcranMarkdown(id, leBtn, indexInTab) {
     let bodyModal = $(leBtn).parent().prev('.modal-body');
     let nom = $(bodyModal).find('.update_nomEcran').val();
-    let content = $(bodyModal).find('.update_contenuEcran').val();
+    let content = simplemde[indexInTab].value();
     let ecranTime = $(bodyModal).find('.update_ecran_time').val();
 
     if (nom && ecranTime) {
