@@ -24,7 +24,7 @@ class PagesPostController extends Controller {
     public function login(Request $request, Response $response) {
         $email = htmlspecialchars(trim($request->getParam('email_address')));
         $password = htmlspecialchars(trim($request->getParam('password')));
-        
+
         if(empty($email) || empty($password)) {
             $this->flash('Un ou plusieurs champs sont vide(s) !', 'error');
         } else {
@@ -88,7 +88,7 @@ class PagesPostController extends Controller {
     public function screenDelete(Request $request, Response $response) {
         $id = $request->getParam('id');
         $exist = Ecran::where('id', '=', $id)->count();
-        
+
         if(!$exist) {
             return "L'écran que vous essayez de supprimer n'existe pas !";
         } else {
@@ -127,14 +127,14 @@ class PagesPostController extends Controller {
             $duration = $ytb->getVideoInfo($content)->contentDetails->duration;
             $duration = $this->ISO8601ToSeconds($duration) + 2;
             Ecran::where('id', '=', $id)->update(['nom' => $name, 'contenu' => $content, 'temps' => $duration * 1000]);
-            return "success";
+            return "success{time={$duration}}";
         }
     }
 
     public function sequenceDelete(Request $request, Response $response) {
         $id = $request->getParam('id');
         $exist = Sequence::where('id', '=', $id)->count();
-        
+
         if(!$exist) {
             return "La séquence que vous essayez de supprimer n'existe pas !";
         } else {
@@ -200,7 +200,7 @@ class PagesPostController extends Controller {
                     $this->flash("L'utilisateur a été créé avec succès !");
                 }
             }
-        }        
+        }
         return $this->redirect($response, 'createUser');
     }
 
@@ -253,7 +253,7 @@ class PagesPostController extends Controller {
     public function userDelete(Request $request, Response $response) {
         $id = $request->getParam('id');
         $exist = Utilisateur::where('id', '=', $id)->count();
-        
+
         if(!$exist) {
             return "L'utilisateur que vous essayez de supprimer n'existe pas !";
         } else {
@@ -268,9 +268,9 @@ class PagesPostController extends Controller {
         $lastname = htmlspecialchars(trim($request->getParam('newPrenom')));
         $email = htmlspecialchars(trim($request->getParam('newEmail')));
         $rank = htmlspecialchars(trim($request->getParam('newRank')));
-    
+
         $exist = Utilisateur::where('id', '=', $id)->count();
-    
+
 
 
         if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -282,7 +282,7 @@ class PagesPostController extends Controller {
                 Utilisateur::where('id', '=', $id)->update(['nom' => $firstname, 'prenom' => $lastname, 'email' => $email, 'is_superadmin' => $rank]);
                 return "success";
             }
-        } 
+        }
 
     }
 

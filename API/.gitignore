@@ -1,2 +1,5 @@
 vendor/*
 log/*
+vendor
+config/db.ini
+config/

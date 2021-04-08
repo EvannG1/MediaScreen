@@ -10,7 +10,7 @@ class AuthMiddleware {
 
     public function __construct(Container $container)
     {
-        $this->container = $container;   
+        $this->container = $container;
     }
 
     public function __invoke(Request $request, Response $response, $next) {

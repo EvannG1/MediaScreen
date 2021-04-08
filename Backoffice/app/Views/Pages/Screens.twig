@@ -238,9 +238,16 @@ function updateEcranVideo(id, leBtn) {
         http.onreadystatechange = function () {
             if (http.readyState == 4 && http.status == 200) {
                   console.log(http.responseText);
-                if (http.responseText == 'success') {
+                let reponse = http.responseText;
+                if (reponse.startsWith('success')) {
+                    if(reponse.search('time')){//enlever la condition vu que c'est une vidéo il devra toujours etre retourné un temps
+                      let time;
+                      time = reponse.split("=")[1];
+                      time = time.replace("}", '');
+                      $(lineUpdate).find('.panel_duree').text(time + "s");
+                    }
+
                     $(lineUpdate).find('.panel_nomEcran').text(nom);
-                    $(lineUpdate).find('.panel_duree').text(http.responseText['duration'] + "s");
                     $(model).modal('hide');
                     showNotification('success', "Succès : L'écran : " + nom + " a bien été modifié.");
                 } else {

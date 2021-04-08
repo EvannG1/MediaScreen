@@ -1,5 +1,6 @@
 // URL vers l'API
 const API = "http://localhost:8001";
+//Lucas : const API = "http://localhost/affichage_dyn/mediascreen_ezcorp/API/public/index.php";
 
 // Récuperer le token dans le local storage
 let token = localStorage.getItem('token');
