@@ -1,6 +1,6 @@
 // URL vers l'API
 const API = "http://localhost:8001";
-//Lucas : const API = "http://localhost/affichage_dyn/mediascreen_ezcorp/API/public/index.php";
+// LUCAS -> const API = "http://localhost/affichage_dyn/mediascreen_ezcorp/API/public/index.php";
 
 // Récuperer le token dans le local storage
 let token = localStorage.getItem('token');
@@ -9,7 +9,7 @@ let token = localStorage.getItem('token');
 let body = document.querySelector("body");
 
 // Instanciation du convertisseur MarkDown -> HTML
-let converter = new showdown.Converter();
+let converter = new showdown.Converter({underline: true, metadata: true, simpleLineBreaks: true});
 let timer = 0;
 let index = 0;
 

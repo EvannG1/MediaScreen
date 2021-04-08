@@ -11,6 +11,19 @@
       width: 100%;
     }
 
+    .markdown-btn{
+      display: flex;
+      justify-content: left;
+      flex-wrap: wrap;
+    }
+
+    .markdown-btn button{
+      margin-right: 7px;
+      margin-bottom: 7px;
+      padding: 5px;
+      font-size: 12px;
+    }
+
     {% if screens is empty %}
         table {
             display: none;
@@ -82,6 +95,15 @@
                                         {% if screen.id_type == 1 %}
                                         <div class="form-group">
                                             <label for="markdown_area">Veuillez saisir votre text markdown ci-dessous :</label>
+                                            <div class="markdown-btn">
+                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-h1', event)">Titre niveau 1</button>
+                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-h2', event)">Titre niveau 2</button>
+                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-h3', event)">Titre niveau 3</button>
+                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-talic', event)">Italic</button>
+                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-bold', event)">Gras</button>
+                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-souligner', event)">Souligner</button>
+                                              <button type="button" class="btn btn-outline-dark" onclick="markdowner('make-hr', event)">Put HR</button>
+                                            </div>
                                             <textarea class="form-control update_contenuEcran" id="markdown_area" name="markdown_area" rows="5">{{ screen.contenu }}</textarea>
                                         </div>
                                         <div class="form-group">
@@ -139,7 +161,38 @@
 {% endblock %}
 
 {% block script %}
+<script src="{{ base_url() }}/assets/js/rangyinputs-jquery.js"></script>
 <script>
+
+function markdowner(modder, event){
+  let textarea = $($(event.target).parents('.form-group').find('textarea')[0]);
+
+  switch(modder){
+    case 'make-h1':
+      textarea.surroundSelectedText("#", "");
+      break;
+    case 'make-h2':
+      textarea.surroundSelectedText("##", "");
+      break;
+    case 'make-h3':
+      textarea.surroundSelectedText("###", "");
+      break;
+    case 'make-talic':
+      textarea.surroundSelectedText("*", "*");
+      break;
+    case 'make-bold':
+      textarea.surroundSelectedText("**", "**");
+      break;
+    case 'make-souligner':
+      textarea.surroundSelectedText("__", "__");
+      break;
+    case 'make-hr':
+      textarea.surroundSelectedText("----", "");
+      break;
+
+  }
+}
+
 function hideNotification(time = '500') {
     $('#notification_block').fadeOut(time, () => {
         $('#notification_block').removeClass();
