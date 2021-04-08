@@ -75,10 +75,16 @@ class PagesPostController extends Controller {
                 if(empty($video)) {
                     $this->flash("Le champs ID ne peut être vide !", 'error');
                 } else {
-                    $ytb = new \Madcoda\Youtube\Youtube(array('key' => 'AIzaSyCYy7UEEXjxf7W7XgjNqfNvxSxmsn4I2wI'));
-                    $duration = $ytb->getVideoInfo($video)->contentDetails->duration;
-                    $duration = $this->ISO8601ToSeconds($duration) + 2;
-                    Ecran::insert(['nom' => $screen_name, 'contenu' => $video, 'temps' => $duration * 1000, 'id_sequence' => $id_sequence, 'id_type' => 2, 'auteur' => $_SESSION['id']]);
+                    if(strstr($video, 'https://www.youtube.com/watch')) {
+                        $length = strlen($video);
+                        $idVideo = substr($video, 32, $length);
+                        $ytb = new \Madcoda\Youtube\Youtube(array('key' => 'AIzaSyCYy7UEEXjxf7W7XgjNqfNvxSxmsn4I2wI'));
+                        $duration = $ytb->getVideoInfo($idVideo)->contentDetails->duration;
+                        $duration = $this->ISO8601ToSeconds($duration) + 2;
+                        Ecran::insert(['nom' => $screen_name, 'contenu' => $idVideo, 'temps' => $duration * 1000, 'id_sequence' => $id_sequence, 'id_type' => 2, 'auteur' => $_SESSION['id']]);
+                    } else {
+                        $this->flash("Ceci n'est pas une video youtube !", 'error');
+                    }
                 }
             }
         }
@@ -123,11 +129,17 @@ class PagesPostController extends Controller {
         if(!$exist) {
             return "L'écran que vous essayez de modifier n'existe pas !";
         } else {
-            $ytb = new \Madcoda\Youtube\Youtube(array('key' => 'AIzaSyCYy7UEEXjxf7W7XgjNqfNvxSxmsn4I2wI'));
-            $duration = $ytb->getVideoInfo($content)->contentDetails->duration;
-            $duration = $this->ISO8601ToSeconds($duration) + 2;
-            Ecran::where('id', '=', $id)->update(['nom' => $name, 'contenu' => $content, 'temps' => $duration * 1000]);
-            return "success{time={$duration}}";
+            if(strstr($content, 'https://www.youtube.com/watch')) {
+                $length = strlen($content);
+                $idVideo = substr($content, 32, $length);
+                $ytb = new \Madcoda\Youtube\Youtube(array('key' => 'AIzaSyCYy7UEEXjxf7W7XgjNqfNvxSxmsn4I2wI'));
+                $duration = $ytb->getVideoInfo($idVideo)->contentDetails->duration;
+                $duration = $this->ISO8601ToSeconds($duration) + 2;
+                Ecran::where('id', '=', $id)->update(['nom' => $name, 'contenu' => $idVideo, 'temps' => $duration * 1000]);
+                return "success{time={$duration}}";
+            } else {
+                return "Ceci n'est pas une video youtube !";
+            }
         }
     }
 
